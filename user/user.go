@@ -35,14 +35,14 @@ func Check(c *fiber.Ctx) {
 		return
 	}
 	var user User
-	db := database.DB
+	db := database.UsersDB
 	db.First(&user, dataUU.Email)
 	c.JSON(user)
 }
 
 //GetUsers ...
 func GetUsers(c *fiber.Ctx) {
-	db := database.DB
+	db := database.UsersDB
 	var users []User
 	db.Find(&users)
 	c.JSON(users)
@@ -50,8 +50,8 @@ func GetUsers(c *fiber.Ctx) {
 
 //GetUser ...
 func GetUser(c *fiber.Ctx) {
-	id := c.Params("id")
-	db := database.DB
+	id := c.Params("ID")
+	db := database.UsersDB
 	var user User
 	db.Find(&user, id)
 	c.JSON(user)
@@ -59,14 +59,24 @@ func GetUser(c *fiber.Ctx) {
 
 //NewUser ...
 func NewUser(c *fiber.Ctx) {
-	db := database.DB
+	db := database.UsersDB
 	user := new(User)
 	if err := c.BodyParser(user); err != nil {
 		c.Status(503).Send(err)
 		return
 	}
-	db.Create(&user)
-	c.JSON(user)
+	var user2 User
+	email := c.Params("e,ail")
+	db.First(&user2, email)
+	if user2.Email == user.Email {
+		fmt.Println("User already exists")
+		c.Status(409).Send("User already exists")
+		return
+	} else {
+		db.Create(&user)
+		c.JSON(user)
+	}
+
 }
 
 //UpdateUser ...
@@ -82,8 +92,8 @@ func UpdateUser(c *fiber.Ctx) {
 		return
 	}
 	var user User
-	id := c.Params("id")
-	db := database.DB
+	id := c.Params("ID")
+	db := database.UsersDB
 	db.First(&user, id)
 
 	user = User{
@@ -97,8 +107,8 @@ func UpdateUser(c *fiber.Ctx) {
 
 //DeleteUser ...
 func DeleteUser(c *fiber.Ctx) {
-	id := c.Params("id")
-	db := database.DB
+	id := c.Params("ID")
+	db := database.UsersDB
 
 	var user User
 	db.First(&user, id)

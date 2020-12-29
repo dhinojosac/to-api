@@ -7,6 +7,7 @@ import (
 
 	"database/database"
 
+	"github.com/gofiber/cors"
 	"github.com/gofiber/fiber"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -31,25 +32,37 @@ func setupRoutes(app *fiber.App) {
 	v1.Post("/login", user.Check)
 	v1.Post("/user", user.NewUser)
 	v1.Get("/user", user.GetUsers)
+	v1.Get("/user/:id", user.GetUser)
+	v1.Delete("/user/:id", user.DeleteUser)
 }
 
 func initDatabase() {
 	var err error
-	database.DB, err = gorm.Open("sqlite3", "books.db")
+	database.PatientsDB, err = gorm.Open("sqlite3", "patients.db")
 	if err != nil {
 		panic("failed to connect database")
 	}
 	fmt.Println("Connection Opened to Database")
-	database.DB.AutoMigrate(&patient.Patient{})
+	database.PatientsDB.AutoMigrate(&patient.Patient{})
+	fmt.Println("Database Migrated")
+
+	database.UsersDB, err = gorm.Open("sqlite3", "users.db")
+	if err != nil {
+		panic("failed to connect database")
+	}
+	fmt.Println("Connection Opened to Database")
+	database.UsersDB.AutoMigrate(&user.User{})
 	fmt.Println("Database Migrated")
 }
 
 func main() {
 	app := fiber.New()
+	app.Use(cors.New())
 	initDatabase()
 
 	setupRoutes(app)
 	app.Listen(":3002")
 
-	defer database.DB.Close()
+	defer database.PatientsDB.Close()
+	defer database.UsersDB.Close()
 }

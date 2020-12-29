@@ -25,7 +25,7 @@ type Patient struct {
 
 //GetPatients ...
 func GetPatients(c *fiber.Ctx) {
-	db := database.DB
+	db := database.PatientsDB
 	var patients []Patient
 	db.Find(&patients)
 	c.JSON(patients)
@@ -34,7 +34,7 @@ func GetPatients(c *fiber.Ctx) {
 //GetPatient ...
 func GetPatient(c *fiber.Ctx) {
 	id := c.Params("id")
-	db := database.DB
+	db := database.PatientsDB
 	var patient Patient
 	db.Find(&patient, id)
 	c.JSON(patient)
@@ -42,7 +42,7 @@ func GetPatient(c *fiber.Ctx) {
 
 //NewPatient ...
 func NewPatient(c *fiber.Ctx) {
-	db := database.DB
+	db := database.PatientsDB
 	patient := new(Patient)
 	if err := c.BodyParser(patient); err != nil {
 		c.Status(503).Send(err)
@@ -67,7 +67,7 @@ func UpdatePatient(c *fiber.Ctx) {
 	}
 	var patient Patient
 	id := c.Params("id")
-	db := database.DB
+	db := database.PatientsDB
 	db.First(&patient, id)
 
 	patient = Patient{
@@ -83,7 +83,7 @@ func UpdatePatient(c *fiber.Ctx) {
 //DeletePatient ...
 func DeletePatient(c *fiber.Ctx) {
 	id := c.Params("id")
-	db := database.DB
+	db := database.PatientsDB
 
 	var patient Patient
 	db.First(&patient, id)

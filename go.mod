@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	database/database v0.0.0-00010101000000-000000000000
+	github.com/gofiber/cors v0.2.2
 	github.com/gofiber/fiber v1.14.6
 	github.com/jinzhu/gorm v1.9.16
 	patient/patient v0.0.0-00010101000000-000000000000
