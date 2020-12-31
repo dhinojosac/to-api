@@ -11,6 +11,8 @@ import (
 	"github.com/gofiber/fiber"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+
+	jwtware "github.com/gofiber/jwt"
 )
 
 func helloWorld(c *fiber.Ctx) {
@@ -23,17 +25,26 @@ func setupRoutes(app *fiber.App) {
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
 
+	v1.Post("/login", user.Login)
+	v1.Post("/singup", user.NewUser)
+
+	v1.Post("/user", user.NewUser)
+	v1.Get("/user", user.GetUsers)
+	v1.Get("/user/:id", user.GetUser)
+	v1.Delete("/user/:id", user.DeleteUser)
+
+	// JWT Middleware
+	app.Use(jwtware.New(jwtware.Config{
+		SigningKey: []byte("secret"),
+	}))
+
+	// Restricted routes
 	v1.Get("/patient", patient.GetPatients)
 	v1.Get("/patient/:id", patient.GetPatient)
 	v1.Post("/patient", patient.NewPatient)
 	v1.Patch("/patient/:id", patient.UpdatePatient)
 	v1.Delete("/patient/:id", patient.DeletePatient)
 
-	v1.Post("/login", user.Check)
-	v1.Post("/user", user.NewUser)
-	v1.Get("/user", user.GetUsers)
-	v1.Get("/user/:id", user.GetUser)
-	v1.Delete("/user/:id", user.DeleteUser)
 }
 
 func initDatabase() {

@@ -33,10 +33,10 @@ func GetPatients(c *fiber.Ctx) {
 
 //GetPatient ...
 func GetPatient(c *fiber.Ctx) {
-	id := c.Params("id")
+	id := c.Params("ID")
 	db := database.PatientsDB
 	var patient Patient
-	db.Find(&patient, id)
+	db.First(&patient, id)
 	c.JSON(patient)
 }
 

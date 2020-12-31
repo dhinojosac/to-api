@@ -6,6 +6,7 @@ require (
 	database/database v0.0.0-00010101000000-000000000000
 	github.com/gofiber/cors v0.2.2
 	github.com/gofiber/fiber v1.14.6
+	github.com/gofiber/jwt v0.2.0
 	github.com/jinzhu/gorm v1.9.16
 	patient/patient v0.0.0-00010101000000-000000000000
 	user/user v0.0.0-00010101000000-000000000000

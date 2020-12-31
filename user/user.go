@@ -2,9 +2,11 @@ package user
 
 import (
 	"fmt"
+	"time"
 
 	"database/database"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -19,25 +21,38 @@ type User struct {
 	Password  string `json:"password"`
 }
 
-//Check ...
-func Check(c *fiber.Ctx) {
-	/*
-		type DataAdminUser struct {
-			FirstName string `json:"firstname"`
-			LastName  string `json:"lastname"`
-			Email     string `json:"email"`
-			Password  string `json:"password"`
-		}
-	*/
-	var dataUU User
-	if err := c.BodyParser(&dataUU); err != nil {
+//Login ...
+func Login(c *fiber.Ctx) {
+	var user User
+	if err := c.BodyParser(&user); err != nil {
 		c.Status(503).Send(err)
 		return
 	}
-	var user User
-	db := database.UsersDB
-	db.First(&user, dataUU.Email)
-	c.JSON(user)
+
+	// Throws Unauthorized error
+	if user.Email != "d.hinojosa.cordova@gmail.com" || user.Password != "admin" {
+		c.Status(401).Send("Unauthorized")
+		return
+	}
+
+	// Create token
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["name"] = "admin"
+	claims["admin"] = true
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		c.Status(409).Send("cannot create token")
+		return
+	}
+
+	c.JSON(fiber.Map{"token": t, "user": user.Email})
+
 }
 
 //GetUsers ...
